@@ -1,0 +1,150 @@
+﻿Репорт по командам и конфигам.
+
+
+Установка Apache + PHPMyAdmin:
+
+[VM1]
+
+
+yum install httpd 
+yum install httpd-devel
+yum install httpd-tools
+
+systemctl start httpd.service
+systemctl enable httpd.service
+
+systemctl stop firewalld
+systemctl disable firewalld
+sed -i -e 's/SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
+reboot
+setsebool -P httpd_can_network_connect on
+
+
+Установка PHP 7.x
+yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+yum install yum-utils
+yum-config-manager --enable remi-php73  
+yum install php php-mcrypt php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo
+
+yum install epel-release
+yum install phpmyadmin
+yum install php
+vim /etc/httpd/conf.d/phpMyAdmin.conf
+
+ <RequireAny>
+       Require ip 10.0.2.2    <- добавили адрес, который увидели в журнале /var/log/httpd/access_log
+       Require ip 127.0.0.1
+       Require ip ::1
+     </RequireAny>
+   </IfModule>
+   
+   
+ [VM2] MariaDB
+yum install mariadb-server mariadb
+systemctl start mariadb.service
+systemctl enable mariadb.service
+systemctl stop firewalld
+systemctl disable firewalld
+
+MariaDB [(none)]> create database testdb;
+MariaDB [(none)]> create user 'testuser'@'10.0.2.129' identified by 'password';
+MariaDB [(none)]> grant all on testdb.* to 'testuser'@'10.0.2.129' identified by 'password';
+MariaDB [(none)]> exit;
+
+------------------------------------------------------------------------------------------------------------
+Dokuwiki
+
+wget https://download.dokuwiki.org/src/dokuwiki/dokuwiki-stable.tgz -O /tmp/dokuwiki.tgz
+tar xzfv /tmp/dokuwiki.tgz -C /var/www
+chown -R apache:apache /var/www/dokuwiki
+chown -R apache:apache /var/www/dokuwiki-2018-04-22b/
+chmod 777 -R dokuwiki/
+vim /etc/httpd/conf.d/dokuwiki.conf
+mv /var/www/dokuwiki-2018-04-22b/ /var/www/html
+mv dokuwiki-2018-04-22b/ dokuwiki
+
+Создать конфиг виртуального хоста
+vim /etc/httpd/conf.d/dokuwiki.conf
+
+
+<VirtualHost *:80>
+    ServerName wiki.mysite
+    ServerAlias www.wiki.mysite
+    DocumentRoot /var/www/html/dokuwiki
+    ErrorLog /var/log/httpd/wiki.mysite_error.log
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" wiki.mysite
+    CustomLog /var/log/httpd/wiki.mysite_access_mysite.log wiki.mysite
+    <Directory /var/www/html/dokuwiki>
+        AllowOverride None
+        Options FollowSymLinks
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+systemctrl restart httpd
+
+Добавить в etc/hosts на винде 127.0.0.1 wiki.mysite
+Обращение в браузере: wiki.mysite:8888
+----------------------------------------------------------------------------------------------------------
+Wordpress
+
+
+mysql -u root -p
+CREATE DATABASE wordpress;
+CREATE USER 'wordpressuser'@'10.0.2.129' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpressuser'@'10.0.2.129' IDENTIFIED BY 'password';
+FLUSH PRIVILEGES;
+exit
+
+wget http://wordpress.org/latest.tar.gz
+tar xzvf latest.tar.gz
+mv wordpress/ /var/www/html/
+chown -R apache:apache /var/www/html/wordpress
+cp wp-config-sample.php wp-config.php
+
+То, что нужно изменить. Остальное оставляем как есть
+// ** MySQL settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define('DB_NAME', 'wordpress');
+
+/** MySQL database username */
+define('DB_USER', 'wordpressuser');
+
+/** MySQL database password */
+define('DB_PASSWORD', 'password');
+
+/** MySQL hostname */
+define( 'DB_HOST', '10.0.2.130' );
+
+Создаем виртуальный хост
+vim /etc/httpd/conf.d/wordpress.conf
+
+
+<VirtualHost *:80>
+    ServerName wordpress.mysite
+    ServerAlias www.wordpress.mysite
+    DocumentRoot /var/www/html/wordpress
+    ErrorLog /var/log/httpd/wordpress.mysite_error.log
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"" wordpress.mysite
+    CustomLog /var/log/httpd/wordpress.mysite_access_mysite.log wordpress.mysite
+    <Directory /var/www/html/wordpress>
+        AllowOverride None
+        Options FollowSymLinks
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+systemctrl restart httpd
+
+Добавить в etc/hosts на винде 127.0.0.1 wordpress.mysite
+Обращение в браузере: wordpress.mysite:8888
+
+
+
+
+
+
+
+
+

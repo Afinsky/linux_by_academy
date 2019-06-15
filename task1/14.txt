@@ -1,0 +1,8 @@
+* Output of entire files::     	-	cat tac nl od base64
+* Output of parts of files::    - 	head tail split csplit
+* Basic operations::           	-	cp dd install mv rm shred
+* Changing file attributes::    -	chgrp chmod chown touch
+* Disk usage::               	-	df du stat sync truncate
+* User information::         	-	id logname whoami groups users who
+* System context::              -	date arch nproc uname hostname hostid uptime
+

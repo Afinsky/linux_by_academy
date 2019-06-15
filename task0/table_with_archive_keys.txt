@@ -1,0 +1,9 @@
+Command to extract  data.gz file?				       	-	gunzip data.gz or gzip -d data.gz
+
+Command to put  /home directory  to archive xz compression archive?	-	tar -czf /tmp/home.tar.xz /home
+
+Command to look through files from info.tar file?			- 	tar -tvf info.tar
+
+Which option allows to change the directory in tar command?		-	-C
+
+

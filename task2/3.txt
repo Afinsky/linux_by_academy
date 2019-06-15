@@ -1,0 +1,21 @@
+¬ history каша, поэтому вот команды которые были задествованы при создании пользователей:
+
+[root@localhost bender]#
+useradd bender
+passwd bender 
+futurama
+
+useradd flexo
+passwd flexo
+iamarobot
+
+su bender
+passwd
+ilovelinux
+su root
+passwd bender
+futurama
+
+groupadd mafia
+usermod -a -G mafia flexo
+usermod -a -G mafia bender

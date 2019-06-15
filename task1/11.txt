@@ -1,0 +1,11 @@
+ls
+cat
+cp
+mv
+diff
+rm
+grep
+
+
+
+

@@ -1,0 +1,9 @@
+/bin/zcat: POSIX shell script, ASCII text executable
+/dev/null: character special
+/dev/sda: block special
+/dev/tty: character special
+/dev/zero: character special
+/etc/passwd: ASCII text
+/proc/mounts: empty
+/root: directory
+/bin/ls: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.32, BuildID[sha1]=ceaf496f3aec08afced234f4f36330d3d13a657b, stripped
